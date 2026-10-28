@@ -4,215 +4,22 @@
  */
 window.DPARTS_DB = {
   "templates": {
-    "POOL GATE": {
-      "title": "GATES",
+    "FENCE": {
+      "title": "Fence Hardware & Accessories",
       "items": [
         {
-          "selected": true,
+          "selected": false,
           "qty": 2,
           "partNo": "",
-          "description": "3\" Leaf Hinges",
+          "description": "1.5\" Press Caps",
           "finish": "No Paint",
           "instructions": ""
         },
         {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "Lock Box KING # 15-104 (1-1/2\" Wide)",
-          "finish": "Primer",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "TB-175",
-          "finish": "No Paint",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "Spring Assist Closer",
-          "finish": "No Paint",
-          "instructions": ""
-        }
-      ]
-    },
-    "PED GATE": {
-      "title": "Ped Gates ( perimeter, Dog Park, Misc)",
-      "items": [
-        {
-          "selected": true,
+          "selected": false,
           "qty": 2,
           "partNo": "",
-          "description": "3\" Leaf Hinges",
-          "finish": "No Paint",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "Lock Box KING # 15-104 (1-1/2\" Wide)",
-          "finish": "Primer",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "TB-175",
-          "finish": "No Paint",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "Spring Assist Closer",
-          "finish": "No Paint",
-          "instructions": ""
-        }
-      ]
-    },
-    "UNIT GATE": {
-      "title": "Unit / Maitenence Gates",
-      "items": [
-        {
-          "selected": true,
-          "qty": 2,
-          "partNo": "",
-          "description": "3\" Leaf Hinges",
-          "finish": "No Paint",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "Gravity Latch ( Locking)",
-          "finish": "No Paint",
-          "instructions": ""
-        }
-      ]
-    },
-    "JPI STD GATES": {
-      "title": "JPI STD GATES except at Units/ Dumpster",
-      "items": [
-        {
-          "selected": true,
-          "qty": 2,
-          "partNo": "",
-          "description": "3\" Leaf Hinges",
-          "finish": "No Paint",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "Lock Box",
-          "finish": "No Paint",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "TB-175",
-          "finish": "No Paint",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "Spring Assist Closer",
-          "finish": "No Paint",
-          "instructions": ""
-        }
-      ]
-    },
-    "DUMPSTER GATE": {
-      "title": "DUMPSTER GATES ( PAIR)",
-      "items": [
-        {
-          "selected": true,
-          "qty": 4,
-          "partNo": "",
-          "description": "7\" Barrell hinges",
-          "finish": "No Paint",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 2,
-          "partNo": "",
-          "description": "Cane Bolt Assembly (18\")",
-          "finish": "Primer",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "Spring Assist Closer",
-          "finish": "No Paint",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "QHB1 Gate Stop",
-          "finish": "Primer",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "Slide Bolts King #1-1000 (9-1/2\" Length)",
-          "finish": "No Paint",
-          "instructions": ""
-        }
-      ]
-    },
-    "ACCESS GATES": {
-      "title": "Building Access GATES",
-      "items": [
-        {
-          "selected": true,
-          "qty": 2,
-          "partNo": "",
-          "description": "3\" Leaf Hinges",
-          "finish": "No Paint",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "Lock Box KING # 15-104 (1-1/2\" Wide)",
-          "finish": "Primer",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "TB-175",
-          "finish": "No Paint",
-          "instructions": ""
-        },
-        {
-          "selected": true,
-          "qty": 1,
-          "partNo": "",
-          "description": "Spring Assist Closer",
+          "description": "2\" Press Caps",
           "finish": "No Paint",
           "instructions": ""
         }

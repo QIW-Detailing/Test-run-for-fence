@@ -29,6 +29,9 @@ const CadEngine = {
         if (includeBasePlates === 'yes') {
             model.models.basePlates = { models: {} };
         }
+        if (capPlateMode === 'yes' || capPlateMode === true) {
+            model.models.capPlates = { models: {} };
+        }
         
         const rad = slope * Math.PI / 180;
         const tan = Math.tan(rad);
@@ -112,6 +115,23 @@ const CadEngine = {
         const createTiltedRailSpan = (cx_i, yIntercept, thickness, type) => {
             const rail = { models: {}, paths: {} };
             const clearWidth = actualPostSpacing - effectivePostW;
+            const startX = cx_i + effectivePostW / 2;
+            const endX = startX + clearWidth;
+
+            if (slope !== 0) {
+                const y_base = yIntercept - effectiveEmbed;
+                const p1 = [startX, y_base + startX * tan];
+                const p2 = [endX, y_base + endX * tan];
+                const p3 = [endX, y_base + thickness + endX * tan];
+                const p4 = [startX, y_base + thickness + startX * tan];
+                rail.paths = {
+                    bot: new makerjs.paths.Line(p1, p2),
+                    right: new makerjs.paths.Line(p2, p3),
+                    top: new makerjs.paths.Line(p3, p4),
+                    left: new makerjs.paths.Line(p4, p1)
+                };
+                return rail;
+            }
             
             // Calculate precise sloped length of the rail span: clearWidth / cos(slope)
             const cos = Math.cos(rad);
@@ -140,8 +160,6 @@ const CadEngine = {
                 }
             }
 
-            makerjs.model.rotate(rail, slope);
-            const startX = cx_i + effectivePostW / 2;
             rail.origin = [startX, startX * tan - effectiveEmbed + yIntercept];
             return rail;
         };
@@ -1389,8 +1407,8 @@ const CadEngine = {
         return model;
     },
 
-    createRailsGates: function(length, fenceHeight, postHeight, leftPostW, rightPostW, midPostW, midPostCount, topRailH, midRailH, botRailH, picketW, picketSpacing, slope, leftPostType = 'hss_rect', rightPostType = 'hss_rect', midPostType = 'hss_rect', topRailType = 'hss_rect', midRailType = 'none', botRailType = 'hss_rect', picketType = 'hss_rect', includeBasePlates = 'no', bpW = 6.0, bpH = 0.5, bpHoleD = 0.5, bpHoleOffsetX = 0.5, bpHoleOffsetY = 0.25, midRailGap = 6.0, railsGatesType = 'gates', kickPlate = 'none', kickPlateH = 12.0, kickPlateWeld = 'inner', kickPlateSize = 'PL11GA', meshType = 'none', meshOpening = 2.0, infillType = 'pickets', puppyPickets = 'no', puppyPicketsLength = 16.0, puppyPicketsSpacing = 2.0, braceType = 'none', braceW = 2.0, sidingType = 'none', braceWeld = 'inner', deckPlacement = 'back', fluteOrientation = 'vertical', deckRetainer = 'none', picketMidJoint = 'through', maxDeckLen = 24.0, maxDeckWidth = 36.0) {
-        if (!this.isLibReady()) return this._fallback_rails_gates(length, fenceHeight, postHeight, leftPostW, rightPostW, midPostW, midPostCount, topRailH, midRailH, botRailH, picketW, picketSpacing, slope, leftPostType, rightPostType, midPostType, topRailType, midRailType, botRailType, picketType, includeBasePlates, bpW, bpH, bpHoleD, bpHoleOffsetX, bpHoleOffsetY, midRailGap, railsGatesType, kickPlate, kickPlateH, kickPlateWeld, kickPlateSize, meshType, meshOpening, infillType, puppyPickets, puppyPicketsLength, puppyPicketsSpacing);
+    createRailsGates: function(length, fenceHeight, postHeight, leftPostW, rightPostW, midPostW, midPostCount, topRailH, midRailH, botRailH, picketW, picketSpacing, slope = 0, leftPostType = 'hss_rect', rightPostType = 'hss_rect', midPostType = 'hss_rect', topRailType = 'hss_rect', midRailType = 'none', botRailType = 'hss_rect', picketType = 'hss_rect', includeBasePlates = 'no', bpW = 6.0, bpH = 0.5, bpHoleD = 0.5, bpHoleOffsetX = 0.5, bpHoleOffsetY = 0.25, midRailGap = 6.0, railsGatesType = 'gates', kickPlate = 'none', kickPlateH = 12.0, kickPlateWeld = 'inner', kickPlateSize = 'PL11GA', meshType = 'none', meshOpening = 2.0, infillType = 'pickets', puppyPickets = 'no', puppyPicketsLength = 16.0, puppyPicketsSpacing = 2.0, braceType = 'none', braceW = 2.0, sidingType = 'none', braceWeld = 'inner', deckPlacement = 'back', fluteOrientation = 'vertical', deckRetainer = 'none', picketMidJoint = 'through', maxDeckLen = 24.0, maxDeckWidth = 36.0, botRailElevation = 0.0, topGap = 0.0, wantLeftPost = 'no', wantRightPost = 'no', midPostCenters = null, lengthRef = 'c_to_c', capPlateMode = 'no', capPlateThickness = 0.25, capPlateWidth = 2.0, capPlateLength = 2.0, midRailExtraPickets = "no") {
+        if (!this.isLibReady()) return this._fallback_rails_gates(length, fenceHeight, postHeight, leftPostW, rightPostW, midPostW, midPostCount, topRailH, midRailH, botRailH, picketW, picketSpacing, slope, leftPostType, rightPostType, midPostType, topRailType, midRailType, botRailType, picketType, includeBasePlates, bpW, bpH, bpHoleD, bpHoleOffsetX, bpHoleOffsetY, midRailGap, railsGatesType, kickPlate, kickPlateH, kickPlateWeld, kickPlateSize, meshType, meshOpening, infillType, puppyPickets, puppyPicketsLength, puppyPicketsSpacing, botRailElevation, topGap, wantLeftPost, wantRightPost, midPostCenters, lengthRef, capPlateMode, capPlateThickness, capPlateWidth, capPlateLength, midRailExtraPickets);
 
         const model = { 
             models: { 
@@ -1403,9 +1421,26 @@ const CadEngine = {
             model.models.basePlates = { models: {} };
         }
 
-        const rad = slope * Math.PI / 180;
+        midRailGap = (typeof midRailGap !== 'undefined' && !isNaN(parseFloat(midRailGap))) ? parseFloat(midRailGap) : 6.0;
+        topRailH = (typeof topRailH !== 'undefined' && !isNaN(parseFloat(topRailH))) ? parseFloat(topRailH) : 1.5;
+        midRailH = (typeof midRailH !== 'undefined' && !isNaN(parseFloat(midRailH))) ? parseFloat(midRailH) : 1.5;
+        botRailH = (typeof botRailH !== 'undefined' && !isNaN(parseFloat(botRailH))) ? parseFloat(botRailH) : 1.5;
+        picketW = (typeof picketW !== 'undefined' && !isNaN(parseFloat(picketW))) ? parseFloat(picketW) : 0.5;
+
+        const safeSlope = (typeof slope !== 'undefined' && !isNaN(parseFloat(slope))) ? parseFloat(slope) : 0;
+        const rad = safeSlope * Math.PI / 180;
         const tan = Math.tan(rad);
-        const isGates = (railsGatesType === 'gates');
+        const isGates = (railsGatesType === 'gates') && (safeSlope === 0);
+
+        const createPolygonModel = (points) => {
+            const m = { paths: {} };
+            for (let i = 0; i < points.length; i++) {
+                const p1 = points[i];
+                const p2 = points[(i + 1) % points.length];
+                m.paths['edge' + i] = new makerjs.paths.Line(p1, p2);
+            }
+            return m;
+        };
 
         if (isGates) {
             // Mitred full frame gate
@@ -1413,16 +1448,6 @@ const CadEngine = {
             const rightT = 0.12;
             const topT = 0.12;
             const botT = 0.12;
-
-            const createPolygonModel = (points) => {
-                const m = { paths: {} };
-                for (let i = 0; i < points.length; i++) {
-                    const p1 = points[i];
-                    const p2 = points[(i + 1) % points.length];
-                    m.paths['edge' + i] = new makerjs.paths.Line(p1, p2);
-                }
-                return m;
-            };
 
             // 1. Left Side Runner (polygon with sloped miter ends)
             if (leftPostType !== 'none') {
@@ -1445,6 +1470,17 @@ const CadEngine = {
                     leftPost.models.inner = createPolygonModel(leftInner);
                 }
                 model.models.posts.models['leftPost'] = leftPost;
+
+                if (capPlateMode === 'yes' || capPlateMode === true) {
+                    const capT = parseFloat(capPlateThickness) || 0.25;
+                    const capW = parseFloat(capPlateWidth) || leftPostW;
+                    const capLeft = {
+                        models: { outer: new makerjs.models.Rectangle(capW, capT) },
+                        origin: [leftPostW / 2 - capW / 2, fenceHeight]
+                    };
+                    if (!model.models.capPlates) model.models.capPlates = { models: {} };
+                    model.models.capPlates.models['capLeft'] = capLeft;
+                }
             }
 
             // 2. Right Side Runner
@@ -1468,6 +1504,17 @@ const CadEngine = {
                     rightPost.models.inner = createPolygonModel(rightInner);
                 }
                 model.models.posts.models['rightPost'] = rightPost;
+
+                if (capPlateMode === 'yes' || capPlateMode === true) {
+                    const capT = parseFloat(capPlateThickness) || 0.25;
+                    const capW = parseFloat(capPlateWidth) || rightPostW;
+                    const capRight = {
+                        models: { outer: new makerjs.models.Rectangle(capW, capT) },
+                        origin: [length - rightPostW / 2 - capW / 2, fenceHeight]
+                    };
+                    if (!model.models.capPlates) model.models.capPlates = { models: {} };
+                    model.models.capPlates.models['capRight'] = capRight;
+                }
             }
 
             // 3. Top Runner
@@ -1605,7 +1652,7 @@ const CadEngine = {
                         }
 
                         // 2. Lower Picket segment (only when pickets pass through mid runner, and not hidden by kick plate)
-                        if (picketMidJoint !== 'weld_top') {
+                        if (picketMidJoint !== 'weld_top' || midRailExtraPickets === 'yes') {
                             const lowerY0 = hasKP ? Math.max(botRailH, kpTopY) : botRailH;
                             const lowerY1 = midY_bot;
                             if (lowerY1 > lowerY0 + 0.1) {
@@ -2104,76 +2151,140 @@ const CadEngine = {
             }
 
         } else {
-            // Original rails/fences center posts logic
-            const pt = 0.2; 
+            // FENCE: True fence assembly with vertical POSTS on left and right, and horizontal runners connecting between posts (no 45-degree corner miters!)
+            const pt = 0.12; 
             
-            const leftPostHeight = postHeight;
-            const leftPost = { models: {}, paths: {} };
-            leftPost.models.outer = new makerjs.models.Rectangle(leftPostW, leftPostHeight);
-            if (leftPostType === 'hss_rect' && leftPostW > 2 * pt) {
-                leftPost.models.inner = new makerjs.models.Rectangle(leftPostW - 2 * pt, leftPostHeight - 2 * pt);
-                leftPost.models.inner.origin = [pt, pt];
-            }
-            const effectiveEmbed = (includeBasePlates === 'yes') ? 0 : Math.max(0, postHeight - fenceHeight - 6.0);
-            leftPost.origin = [0, -effectiveEmbed];
-            model.models.posts.models['leftPost'] = leftPost;
+            const safeTopGap = (typeof topGap !== 'undefined' && !isNaN(parseFloat(topGap))) ? Math.max(0, parseFloat(topGap)) : 0;
+            const panelTopY = fenceHeight;
+            const postTopY = fenceHeight + safeTopGap;
+            const postBottomY = postTopY - postHeight;
 
-            if (includeBasePlates === 'yes') {
-                const bp = {
-                    models: { outer: new makerjs.models.Rectangle(bpW, bpH) },
-                    paths: {
-                        h1: new makerjs.paths.Circle([bpHoleOffsetX, bpHoleOffsetY], bpHoleD / 2),
-                        h2: new makerjs.paths.Circle([bpW - bpHoleOffsetX, bpHoleOffsetY], bpHoleD / 2)
+            // 1. Left Post (vertical column from bottom to top) - only rendered if wantLeftPost !== 'no'
+            if (leftPostType !== 'none' && wantLeftPost !== 'no') {
+                const leftPost = { models: {}, paths: {} };
+                leftPost.models.outer = new makerjs.models.Rectangle(leftPostW, postHeight);
+                if (leftPostType === 'hss_rect' && leftPostW > 2 * pt) {
+                    leftPost.models.inner = new makerjs.models.Rectangle(leftPostW - 2 * pt, postHeight - 2 * pt);
+                    leftPost.models.inner.origin = [pt, pt];
+                }
+                leftPost.origin = [0, postBottomY];
+                model.models.posts.models['leftPost'] = leftPost;
+
+                if (includeBasePlates === 'yes') {
+                    const bp = {
+                        models: { outer: new makerjs.models.Rectangle(bpW, bpH) },
+                        paths: {
+                            h1: new makerjs.paths.Circle([bpHoleOffsetX, bpHoleOffsetY], bpHoleD / 2),
+                            h2: new makerjs.paths.Circle([bpW - bpHoleOffsetX, bpHoleOffsetY], bpHoleD / 2)
+                        }
+                    };
+                    bp.origin = [leftPostW/2 - bpW/2, postBottomY - bpH];
+                    model.models.basePlates.models['bpLeft'] = bp;
+                }
+
+                if (capPlateMode === 'yes' || capPlateMode === true) {
+                    const capT = parseFloat(capPlateThickness) || 0.25;
+                    const capW = parseFloat(capPlateWidth) || leftPostW;
+                    const capLeft = {
+                        models: { outer: new makerjs.models.Rectangle(capW, capT) },
+                        origin: [leftPostW / 2 - capW / 2, postTopY]
+                    };
+                    if (!model.models.capPlates) model.models.capPlates = { models: {} };
+                    model.models.capPlates.models['capLeft'] = capLeft;
+                }
+            }
+
+            // 2. Right Post (vertical column from bottom to top) - only rendered if wantRightPost !== 'no'
+            if (rightPostType !== 'none' && wantRightPost !== 'no') {
+                const rightPost = { models: {}, paths: {} };
+                rightPost.models.outer = new makerjs.models.Rectangle(rightPostW, postHeight);
+                if (rightPostType === 'hss_rect' && rightPostW > 2 * pt) {
+                    rightPost.models.inner = new makerjs.models.Rectangle(rightPostW - 2 * pt, postHeight - 2 * pt);
+                    rightPost.models.inner.origin = [pt, pt];
+                }
+                const rightPx = length - rightPostW;
+                const rightPyBase = length * tan;
+                rightPost.origin = [rightPx, rightPyBase + postBottomY];
+                model.models.posts.models['rightPost'] = rightPost;
+
+                if (includeBasePlates === 'yes') {
+                    const bp = {
+                        models: { outer: new makerjs.models.Rectangle(bpW, bpH) },
+                        paths: {
+                            h1: new makerjs.paths.Circle([bpHoleOffsetX, bpHoleOffsetY], bpHoleD / 2),
+                            h2: new makerjs.paths.Circle([bpW - bpHoleOffsetX, bpHoleOffsetY], bpHoleD / 2)
+                        }
+                    };
+                    bp.origin = [rightPx + rightPostW/2 - bpW/2, rightPyBase + postBottomY - bpH];
+                    makerjs.model.rotate(bp, slope, [rightPx + rightPostW/2, rightPyBase + postBottomY]);
+                    model.models.basePlates.models['bpRight'] = bp;
+                }
+
+                if (capPlateMode === 'yes' || capPlateMode === true) {
+                    const capT = parseFloat(capPlateThickness) || 0.25;
+                    const capW = parseFloat(capPlateWidth) || rightPostW;
+                    const capRight = {
+                        models: { outer: new makerjs.models.Rectangle(capW, capT) },
+                        origin: [rightPx + rightPostW / 2 - capW / 2, rightPyBase + postTopY]
+                    };
+                    if (safeSlope !== 0) {
+                        makerjs.model.rotate(capRight, safeSlope, [rightPx + rightPostW / 2, rightPyBase + postTopY]);
                     }
-                };
-                bp.origin = [leftPostW/2 - bpW/2, -effectiveEmbed - bpH];
-                model.models.basePlates.models['bpLeft'] = bp;
+                    if (!model.models.capPlates) model.models.capPlates = { models: {} };
+                    model.models.capPlates.models['capRight'] = capRight;
+                }
             }
 
-            const rightPostHeight = postHeight;
-            const rightPost = { models: {}, paths: {} };
-            rightPost.models.outer = new makerjs.models.Rectangle(rightPostW, rightPostHeight);
-            if (rightPostType === 'hss_rect' && rightPostW > 2 * pt) {
-                rightPost.models.inner = new makerjs.models.Rectangle(rightPostW - 2 * pt, rightPostHeight - 2 * pt);
-                rightPost.models.inner.origin = [pt, pt];
-            }
-            const rightPx = length - rightPostW;
-            const rightPyBase = length * tan;
-            rightPost.origin = [rightPx, rightPyBase - effectiveEmbed];
-            model.models.posts.models['rightPost'] = rightPost;
+            const actualLeftPostW = (wantLeftPost !== 'no' && leftPostType !== 'none') ? leftPostW : 0;
+            const actualRightPostW = (wantRightPost !== 'no' && rightPostType !== 'none') ? rightPostW : 0;
+            const clearSpan = length - actualLeftPostW - actualRightPostW;
+            const x0_span = actualLeftPostW;
+            const x1_span = length - actualRightPostW;
 
-            if (includeBasePlates === 'yes') {
-                const bp = {
-                    models: { outer: new makerjs.models.Rectangle(bpW, bpH) },
-                    paths: {
-                        h1: new makerjs.paths.Circle([bpHoleOffsetX, bpHoleOffsetY], bpHoleD / 2),
-                        h2: new makerjs.paths.Circle([bpW - bpHoleOffsetX, bpHoleOffsetY], bpHoleD / 2)
+            const resolvedMidCenters = (midPostCenters && Array.isArray(midPostCenters) && midPostCenters.length > 0)
+                ? midPostCenters
+                : (midPostCount > 0 ? (() => {
+                    const centers = [];
+                    const centerDist = (length - actualLeftPostW - actualRightPostW);
+                    const spanSpacing = centerDist / (midPostCount + 1);
+                    for (let i = 1; i <= midPostCount; i++) {
+                        centers.push(actualLeftPostW + i * spanSpacing);
                     }
-                };
-                bp.origin = [rightPx + rightPostW/2 - bpW/2, rightPyBase - effectiveEmbed - bpH];
-                makerjs.model.rotate(bp, slope, [rightPx + rightPostW/2, rightPyBase - effectiveEmbed]);
-                model.models.basePlates.models['bpRight'] = bp;
-            }
+                    return centers;
+                })() : []);
 
-            const isBentOrExtended = postHeight > fenceHeight;
-            const midPostHeight = isBentOrExtended ? ((postHeight - fenceHeight) + effectiveEmbed) : 0;
-            
-            if (midPostCount > 0 && midPostHeight > 0) {
-                const centerDist = (length - leftPostW/2 - rightPostW/2);
-                const spanSpacing = centerDist / (midPostCount + 1);
-                
-                for (let i = 1; i <= midPostCount; i++) {
-                    const midCx = leftPostW/2 + i * spanSpacing;
+            const topY = panelTopY - topRailH;
+            const midPostH = Math.max(1, topY - postBottomY);
+
+            if (resolvedMidCenters.length > 0) {
+                for (let i = 1; i <= resolvedMidCenters.length; i++) {
+                    const midCx = resolvedMidCenters[i - 1];
                     const midPx = midCx - midPostW/2;
                     const midPyBase = midCx * tan;
                     
                     const midPost = { models: {}, paths: {} };
-                    midPost.models.outer = new makerjs.models.Rectangle(midPostW, midPostHeight);
-                    if (midPostType === 'hss_rect' && midPostW > 2 * pt && midPostHeight > 2 * pt) {
-                        midPost.models.inner = new makerjs.models.Rectangle(midPostW - 2 * pt, midPostHeight - 2 * pt);
-                        midPost.models.inner.origin = [pt, pt];
+                    if (safeSlope !== 0) {
+                        const p1_b = [midPx, postBottomY + midPx * tan];
+                        const p2_b = [midPx + midPostW, postBottomY + (midPx + midPostW) * tan];
+                        const p2_t = [midPx + midPostW, topY + (midPx + midPostW) * tan];
+                        const p1_t = [midPx, topY + midPx * tan];
+                        midPost.models.outer = createPolygonModel([p1_b, p2_b, p2_t, p1_t]);
+                        if (midPostType === 'hss_rect' && midPostW > 2 * pt && midPostH > 2 * pt) {
+                            const ip1_b = [midPx + pt, postBottomY + pt + (midPx + pt) * tan];
+                            const ip2_b = [midPx + midPostW - pt, postBottomY + pt + (midPx + midPostW - pt) * tan];
+                            const ip2_t = [midPx + midPostW - pt, topY - pt + (midPx + midPostW - pt) * tan];
+                            const ip1_t = [midPx + pt, topY - pt + (midPx + pt) * tan];
+                            midPost.models.inner = createPolygonModel([ip1_b, ip2_b, ip2_t, ip1_t]);
+                        }
+                        midPost.origin = [0, 0];
+                    } else {
+                        midPost.models.outer = new makerjs.models.Rectangle(midPostW, midPostH);
+                        if (midPostType === 'hss_rect' && midPostW > 2 * pt && midPostH > 2 * pt) {
+                            midPost.models.inner = new makerjs.models.Rectangle(midPostW - 2 * pt, midPostH - 2 * pt);
+                            midPost.models.inner.origin = [pt, pt];
+                        }
+                        midPost.origin = [midPx, postBottomY];
                     }
-                    midPost.origin = [midPx, midPyBase - effectiveEmbed];
                     model.models.posts.models['midPost_' + i] = midPost;
                     
                     if (includeBasePlates === 'yes') {
@@ -2184,118 +2295,353 @@ const CadEngine = {
                                 h2: new makerjs.paths.Circle([bpW - bpHoleOffsetX, bpHoleOffsetY], bpHoleD / 2)
                             }
                         };
-                        bp.origin = [midPx + midPostW/2 - bpW/2, midPyBase - effectiveEmbed - bpH];
-                        makerjs.model.rotate(bp, slope, [midPx + midPostW/2, midPyBase - effectiveEmbed]);
+                        bp.origin = [midPx + midPostW/2 - bpW/2, midPyBase + postBottomY - bpH];
+                        makerjs.model.rotate(bp, slope, [midPx + midPostW/2, midPyBase + postBottomY]);
                         model.models.basePlates.models['bpMid_' + i] = bp;
                     }
+
+
                 }
             }
 
-            const topY = postHeight - topRailH;
-            const topRail = { models: {}, paths: {} };
-            topRail.models.outer = new makerjs.models.Rectangle(length, topRailH);
-            if (topRailType === 'hss_rect' && topRailH > 2 * pt) {
-                topRail.models.inner = new makerjs.models.Rectangle(length, topRailH - 2 * pt);
-                topRail.models.inner.origin = [0, pt];
-            }
-            
-            topRail.paths.miterL = new makerjs.paths.Line([0, topRailH], [leftPostW, 0]);
-            topRail.paths.miterR = new makerjs.paths.Line([length, topRailH], [length - rightPostW, 0]);
-            
-            topRail.origin = [0, topY];
-            model.models.rails.models['topRail'] = topRail;
+            const createSlopedRunner = (y0_base, h) => {
+                const m = { models: {}, paths: {} };
+                m.models.outer = createPolygonModel([
+                    [x0_span, y0_base + x0_span * tan],
+                    [x1_span, y0_base + x1_span * tan],
+                    [x1_span, y0_base + h + x1_span * tan],
+                    [x0_span, y0_base + h + x0_span * tan]
+                ]);
+                return m;
+            };
 
-            const botY = isBentOrExtended ? (postHeight - fenceHeight) : 0;
-            const botRail = { models: {}, paths: {} };
-            
-            if (!isBentOrExtended) {
-                botRail.models.outer = new makerjs.models.Rectangle(length, botRailH);
-                if (botRailType === 'hss_rect' && botRailH > 2 * pt) {
-                    botRail.models.inner = new makerjs.models.Rectangle(length, botRailH - 2 * pt);
-                    botRail.models.inner.origin = [0, pt];
+            // 3. Top Runner (continuous horizontal runner sitting on top of mid posts, between end posts)
+            if (topRailType !== 'none' && clearSpan > 0) {
+                if (safeSlope !== 0) {
+                    model.models.rails.models['topRail'] = createSlopedRunner(topY, topRailH);
+                } else {
+                    const topRail = { models: {}, paths: {} };
+                    topRail.models.outer = new makerjs.models.Rectangle(clearSpan, topRailH);
+                    if (topRailType === 'hss_rect' && topRailH > 2 * pt) {
+                        topRail.models.inner = new makerjs.models.Rectangle(clearSpan, topRailH - 2 * pt);
+                        topRail.models.inner.origin = [0, pt];
+                    }
+                    topRail.origin = [actualLeftPostW, topY];
+                    model.models.rails.models['topRail'] = topRail;
                 }
-                botRail.paths.miterL = new makerjs.paths.Line([0, 0], [leftPostW, botRailH]);
-                botRail.paths.miterR = new makerjs.paths.Line([length, 0], [length - rightPostW, botRailH]);
-                botRail.origin = [0, 0];
-            } else {
-                const botLen = length - leftPostW - rightPostW;
-                botRail.models.outer = new makerjs.models.Rectangle(botLen, botRailH);
-                if (botRailType === 'hss_rect' && botRailH > 2 * pt) {
-                    botRail.models.inner = new makerjs.models.Rectangle(botLen, botRailH - 2 * pt);
-                    botRail.models.inner.origin = [0, pt];
-                }
-                botRail.origin = [leftPostW, botY];
-            }
-            model.models.rails.models['botRail'] = botRail;
-
-            if (midRailType !== 'none') {
-                const midRailY = topY - midRailGap - midRailH;
-                const midLen = length - leftPostW - rightPostW;
-                const midRail = { models: {}, paths: {} };
-                midRail.models.outer = new makerjs.models.Rectangle(midLen, midRailH);
-                if (midRailType === 'hss_rect' && midRailH > 2 * pt) {
-                    midRail.models.inner = new makerjs.models.Rectangle(midLen, midRailH - 2 * pt);
-                    midRail.models.inner.origin = [0, pt];
-                }
-                midRail.origin = [leftPostW, midRailY];
-                model.models.rails.models['midRail'] = midRail;
             }
 
-            const picketBottomY = botY + botRailH;
-            const picketTopY = (midRailType !== 'none') ? (topY - midRailGap - midRailH) : topY;
-            const picketH = Math.max(2, picketTopY - picketBottomY);
-            
-            const spanCenterDist = (length - rightPostW / 2) - (leftPostW / 2);
+            // Determine runner spans between posts for bottom and mid runners (framed into post sides)
+            const runnerSpans = [];
+            let curX = actualLeftPostW;
+            if (resolvedMidCenters && resolvedMidCenters.length > 0) {
+                resolvedMidCenters.forEach(midCx => {
+                    const mpLeft = midCx - midPostW / 2;
+                    const mpRight = midCx + midPostW / 2;
+                    if (mpLeft > curX) {
+                        runnerSpans.push({ startX: curX, endX: mpLeft });
+                    }
+                    curX = mpRight;
+                });
+            }
+            const finalEndX = length - actualRightPostW;
+            if (finalEndX > curX) {
+                runnerSpans.push({ startX: curX, endX: finalEndX });
+            }
+
+            const createRunnerSegment = (xStart, xEnd, y0_base, h, railType) => {
+                const w = xEnd - xStart;
+                if (w <= 0.01) return null;
+                const m = { models: {}, paths: {} };
+                if (safeSlope !== 0) {
+                    m.models.outer = createPolygonModel([
+                        [xStart, y0_base + xStart * tan],
+                        [xEnd, y0_base + xEnd * tan],
+                        [xEnd, y0_base + h + xEnd * tan],
+                        [xStart, y0_base + h + xStart * tan]
+                    ]);
+                    if (railType === 'hss_rect' && h > 2 * pt) {
+                        m.models.inner = createPolygonModel([
+                            [xStart, y0_base + pt + xStart * tan],
+                            [xEnd, y0_base + pt + xEnd * tan],
+                            [xEnd, y0_base + h - pt + xEnd * tan],
+                            [xStart, y0_base + h - pt + xStart * tan]
+                        ]);
+                    }
+                    m.origin = [0, 0];
+                } else {
+                    m.models.outer = new makerjs.models.Rectangle(w, h);
+                    if (railType === 'hss_rect' && h > 2 * pt) {
+                        m.models.inner = new makerjs.models.Rectangle(w, h - 2 * pt);
+                        m.models.inner.origin = [0, pt];
+                    }
+                    m.origin = [xStart, y0_base];
+                }
+                return m;
+            };
+
+            // 4. Bottom Runner (horizontal runner segments framed between posts and welded to post sides)
+            const hasPosts = (actualLeftPostW > 0 || actualRightPostW > 0 || resolvedMidCenters.length > 0);
+            const botY = hasPosts ? ((typeof botRailElevation !== 'undefined' && !isNaN(parseFloat(botRailElevation))) ? parseFloat(botRailElevation) : 0) : 0;
+            if (botRailType !== 'none' && runnerSpans.length > 0) {
+                runnerSpans.forEach((span, idx) => {
+                    const seg = createRunnerSegment(span.startX, span.endX, botY, botRailH, botRailType);
+                    if (seg) {
+                        const segName = (runnerSpans.length === 1) ? 'botRail' : ('botRail_' + idx);
+                        model.models.rails.models[segName] = seg;
+                        if (idx === 0) model.models.rails.models['botRail'] = seg;
+                    }
+                });
+            }
+
+            // 5. Mid Runner (horizontal runner segments framed between posts and welded to post sides)
+            const midRailY = botY + botRailH + midRailGap;
+            if (midRailType !== 'none' && runnerSpans.length > 0) {
+                runnerSpans.forEach((span, idx) => {
+                    const seg = createRunnerSegment(span.startX, span.endX, midRailY, midRailH, midRailType);
+                    if (seg) {
+                        const segName = (runnerSpans.length === 1) ? 'midRail' : ('midRail_' + idx);
+                        model.models.rails.models[segName] = seg;
+                        if (idx === 0) model.models.rails.models['midRail'] = seg;
+                    }
+                });
+            }
+
+            // 6. Vertical Pickets
+            const hasMid = (midRailType !== 'none');
+            const picketBottomY = (botRailType === 'none') ? (botY + 4) : (botY + botRailH);
+            const picketTopY = (topRailType === 'none') ? panelTopY : (panelTopY - topRailH);
+            const midY_bot = midRailY;
+            const midY_top = midRailY + midRailH;
+
             const targetSpacing = picketSpacing;
-            const numPickets = (picketType !== 'none' && targetSpacing > 0) ? Math.max(0, Math.ceil((spanCenterDist - targetSpacing) / targetSpacing)) : 0;
-            
-            if (picketType !== 'none' && numPickets > 0) {
-                const endGap = (spanCenterDist - (numPickets - 1) * targetSpacing) / 2;
-                
-                for (let i = 0; i < numPickets; i++) {
-                    const px_center = (leftPostW / 2) + endGap + i * targetSpacing;
-                    const px = px_center - picketW / 2;
-                    
-                    let overlapsMidPost = false;
-                    if (midPostCount > 0 && midPostHeight > 0) {
-                        const centerDist = (length - leftPostW/2 - rightPostW/2);
-                        const spanSpacing = centerDist / (midPostCount + 1);
-                        for (let j = 1; j <= midPostCount; j++) {
-                            const midCx = leftPostW/2 + j * spanSpacing;
-                            if (Math.abs(px + picketW/2 - midCx) < (midPostW/2 + picketW/2 + 0.1)) {
-                                overlapsMidPost = true;
-                                break;
+            let numPickets = 0;
+            let faceMargin = 0;
+
+            const createPicketModel = (px_center) => {
+                const px = px_center - picketW / 2;
+                const picket = { models: {} };
+
+                const curPicketBotY = picketBottomY + px_center * tan;
+                const curPicketTopY = picketTopY + px_center * tan;
+                const curMidY_bot = midY_bot + px_center * tan;
+                const curMidY_top = midY_top + px_center * tan;
+
+                if (hasMid) {
+                    // Upper Picket: from top of mid runner to top runner (never inside mid runner)
+                    const uY0 = curMidY_top;
+                    const uY1 = curPicketTopY;
+                    const uH = Math.max(1, uY1 - uY0);
+                    picket.models.upper = new makerjs.models.Rectangle(picketW, uH);
+                    picket.models.upper.origin = [px, uY0];
+                    if (picketType === 'hss_rect' && picketW > 2 * pt) {
+                        picket.models.innerUpper = new makerjs.models.Rectangle(picketW - 2 * pt, uH);
+                        picket.models.innerUpper.origin = [px + pt, uY0];
+                    }
+                    // Lower Picket: from bottom runner to bottom of mid runner (only when not weld_top)
+                    if (picketMidJoint !== 'weld_top' || midRailExtraPickets === 'yes') {
+                        const lY0 = curPicketBotY;
+                        const lY1 = curMidY_bot;
+                        if (lY1 > lY0 + 0.1) {
+                            const lH = lY1 - lY0;
+                            picket.models.lower = new makerjs.models.Rectangle(picketW, lH);
+                            picket.models.lower.origin = [px, lY0];
+                            if (picketType === 'hss_rect' && picketW > 2 * pt) {
+                                picket.models.innerLower = new makerjs.models.Rectangle(picketW - 2 * pt, lH);
+                                picket.models.innerLower.origin = [px + pt, lY0];
                             }
                         }
                     }
-                    
-                    if (overlapsMidPost) continue;
-                    
-                    const picket = { models: {}, paths: {} };
-                    picket.models.outer = new makerjs.models.Rectangle(picketW, picketH);
+                } else {
+                    // Continuous picket from bottom runner to top runner
+                    const pY0 = curPicketBotY;
+                    const pY1 = curPicketTopY;
+                    const pH = Math.max(1, pY1 - pY0);
+                    picket.models.outer = new makerjs.models.Rectangle(picketW, pH);
+                    picket.models.outer.origin = [px, pY0];
                     if (picketType === 'hss_rect' && picketW > 2 * pt) {
-                        picket.models.inner = new makerjs.models.Rectangle(picketW - 2 * pt, picketH - 2 * pt);
-                        picket.models.inner.origin = [pt, pt];
+                        picket.models.inner = new makerjs.models.Rectangle(picketW - 2 * pt, pH);
+                        picket.models.inner.origin = [px + pt, pY0];
                     }
-                    picket.origin = [px, picketBottomY];
-                    model.models.pickets.models['p' + i] = picket;
+                }
+                return picket;
+            };
+
+            const createPuppyPicketModel = (puppyX_center, puppyLen) => {
+                const puppyX = puppyX_center - picketW / 2;
+                const puppy = { models: {} };
+                const py0 = picketBottomY + puppyX_center * tan;
+                const py1_raw = Math.min(py0 + puppyLen, picketTopY + puppyX_center * tan);
+                const py1 = hasMid ? Math.min(py1_raw, midY_bot + puppyX_center * tan) : py1_raw;
+                if (py1 > py0 + 0.1) {
+                    const pyH = py1 - py0;
+                    puppy.models.outer = new makerjs.models.Rectangle(picketW, pyH);
+                    puppy.models.outer.origin = [puppyX, py0];
+                    if (picketType === 'hss_rect' && picketW > 2 * pt) {
+                        puppy.models.inner = new makerjs.models.Rectangle(picketW - 2 * pt, pyH);
+                        puppy.models.inner.origin = [puppyX + pt, py0];
+                    }
+                    return puppy;
+                }
+                return null;
+            };
+
+            if (picketType !== 'none' && targetSpacing > 0) {
+                if (resolvedMidCenters.length > 0) {
+                    // MULTI-SPAN / MID-POST FENCES:
+                    // Bay dividers: start centerline/edge, mid-post centerlines, end centerline/edge.
+                    const startX = (actualLeftPostW > 0) ? (leftPostW / 2) : 0;
+                    const endX = (actualRightPostW > 0) ? (length - rightPostW / 2) : length;
+                    const bayDividers = [startX, ...resolvedMidCenters, endX];
+                    const numBays = bayDividers.length - 1;
+
+                    let pGlobalIdx = 0;
+                    let ppGlobalIdx = 0;
+                    const puppyLen = parseFloat(puppyPicketsLength) || 16.0;
+                    if (puppyPickets === 'yes') {
+                        model.models.puppyPickets = { models: {} };
+                    }
+
+                    for (let b = 0; b < numBays; b++) {
+                        const s1 = bayDividers[b];
+                        const s2 = bayDividers[b + 1];
+                        const isLeftCorner = (b === 0);
+                        const isRightCorner = (b === numBays - 1);
+                        const bayPicketCenters = [];
+
+                        const minCornerGapL = (isLeftCorner && actualLeftPostW > 0) ? (leftPostW / 2 + picketW / 2 + 0.5) : 0.75;
+                        const minCornerGapR = (isRightCorner && actualRightPostW > 0) ? (rightPostW / 2 + picketW / 2 + 0.5) : 0.75;
+
+                        if (isLeftCorner && !isRightCorner) {
+                            // Bay 0: Right end s2 is a mid-post center.
+                            // Distance from mid-post center to adjacent picket is EXACTLY targetSpacing
+                            const pLast = s2 - targetSpacing;
+                            const avail = pLast - s1;
+                            const spaces = Math.max(0, Math.floor((avail - minCornerGapL + 1e-4) / targetSpacing));
+                            const pFirst = pLast - spaces * targetSpacing;
+                            for (let i = 0; i <= spaces; i++) {
+                                bayPicketCenters.push(pFirst + i * targetSpacing);
+                            }
+                        } else if (isRightCorner && !isLeftCorner) {
+                            // Bay N-1: Left end s1 is a mid-post center.
+                            // Distance from mid-post center to adjacent picket is EXACTLY targetSpacing
+                            const pFirst = s1 + targetSpacing;
+                            const avail = s2 - pFirst;
+                            const spaces = Math.max(0, Math.floor((avail - minCornerGapR + 1e-4) / targetSpacing));
+                            for (let i = 0; i <= spaces; i++) {
+                                bayPicketCenters.push(pFirst + i * targetSpacing);
+                            }
+                        } else if (!isLeftCorner && !isRightCorner) {
+                            // Interior bay between two mid-posts:
+                            const pFirst = s1 + targetSpacing;
+                            const pLast = s2 - targetSpacing;
+                            const avail = pLast - pFirst;
+                            if (avail >= -1e-4) {
+                                const spaces = Math.max(0, Math.round(avail / targetSpacing));
+                                const actSpc = (spaces > 0) ? (avail / spaces) : targetSpacing;
+                                for (let i = 0; i <= spaces; i++) {
+                                    bayPicketCenters.push(pFirst + i * actSpc);
+                                }
+                            }
+                        } else {
+                            // Single-span (no mid-posts)
+                            const avail = s2 - s1;
+                            const minGap = 1.5;
+                            const spaces = Math.max(0, Math.floor((avail - 2 * minGap + 1e-4) / targetSpacing));
+                            const spanLen = spaces * targetSpacing;
+                            const endGap = (avail - spanLen) / 2;
+                            const pFirst = s1 + endGap;
+                            for (let i = 0; i <= spaces; i++) {
+                                bayPicketCenters.push(pFirst + i * targetSpacing);
+                            }
+                        }
+
+                        bayPicketCenters.forEach(px_center => {
+                            model.models.pickets.models['p' + pGlobalIdx] = createPicketModel(px_center);
+                            pGlobalIdx++;
+                        });
+
+                        if (puppyPickets === 'yes' && bayPicketCenters.length > 1) {
+                            for (let j = 0; j < bayPicketCenters.length - 1; j++) {
+                                const ppX = (bayPicketCenters[j] + bayPicketCenters[j + 1]) / 2;
+                                const ppModel = createPuppyPicketModel(ppX, puppyLen);
+                                if (ppModel) {
+                                    model.models.puppyPickets.models['pp' + ppGlobalIdx] = ppModel;
+                                    ppGlobalIdx++;
+                                }
+                            }
+                        }
+                    }
+                    numPickets = pGlobalIdx;
+                } else if (clearSpan > 0) {
+                    // SINGLE SPAN (no mid posts)
+                    if (lengthRef === 'c_to_c') {
+                        const fieldCenterDist = clearSpan + leftPostW / 2 + rightPostW / 2;
+                        numPickets = Math.max(0, Math.ceil((fieldCenterDist - targetSpacing - 1e-4) / targetSpacing));
+                        if (numPickets > 0) {
+                            const endGap = (fieldCenterDist - (numPickets - 1) * targetSpacing) / 2;
+                            faceMargin = endGap - leftPostW / 2;
+                        }
+                    } else if (lengthRef === 'c_to_out') {
+                        const fieldCenterDist = clearSpan + leftPostW / 2 + (actualRightPostW > 0 ? rightPostW / 2 : 0);
+                        numPickets = Math.max(0, Math.ceil((fieldCenterDist - targetSpacing - 1e-4) / targetSpacing));
+                        if (numPickets > 0) {
+                            const endGap = (fieldCenterDist - (numPickets - 1) * targetSpacing) / 2;
+                            faceMargin = endGap - leftPostW / 2;
+                        }
+                    } else if (lengthRef === 'out_to_c') {
+                        const fieldCenterDist = clearSpan + (actualLeftPostW > 0 ? leftPostW / 2 : 0) + rightPostW / 2;
+                        numPickets = Math.max(0, Math.ceil((fieldCenterDist - targetSpacing - 1e-4) / targetSpacing));
+                        if (numPickets > 0) {
+                            const endGap = (fieldCenterDist - (numPickets - 1) * targetSpacing) / 2;
+                            faceMargin = endGap - (actualLeftPostW > 0 ? leftPostW / 2 : 0);
+                        }
+                    } else { // out_to_out
+                        const spanCenterDist = (actualRightPostW > 0 || actualLeftPostW > 0) ? ((length - actualRightPostW / 2) - (actualLeftPostW / 2)) : length;
+                        numPickets = Math.max(0, Math.ceil((spanCenterDist - targetSpacing - 1e-4) / targetSpacing));
+                        if (numPickets > 0) {
+                            const endGap = (spanCenterDist - (numPickets - 1) * targetSpacing) / 2;
+                            faceMargin = endGap - (actualLeftPostW > 0 ? (actualLeftPostW / 2) : 0);
+                        }
+                    }
+
+                    if (numPickets > 0) {
+                        for (let i = 0; i < numPickets; i++) {
+                            const px_center = x0_span + faceMargin + i * targetSpacing;
+                            model.models.pickets.models['p' + i] = createPicketModel(px_center);
+                        }
+                    }
+
+                    // Puppy pickets (if enabled)
+                    if (puppyPickets === 'yes' && numPickets > 1) {
+                        model.models.puppyPickets = { models: {} };
+                        const puppyLen = parseFloat(puppyPicketsLength) || 16.0;
+                        const numPuppies = numPickets - 1;
+
+                        for (let j = 0; j < numPuppies; j++) {
+                            const p1_x = x0_span + faceMargin + j * targetSpacing;
+                            const p2_x = p1_x + targetSpacing;
+                            const puppyX_center = (p1_x + p2_x) / 2;
+                            const ppModel = createPuppyPicketModel(puppyX_center, puppyLen);
+                            if (ppModel) {
+                                model.models.puppyPickets.models['pp' + j] = ppModel;
+                            }
+                        }
+                    }
                 }
             }
-        }
-
-        if (slope) {
-            makerjs.model.rotate(model, slope);
         }
 
         return model;
     },
 
-    _fallback_rails_gates: function(length, fenceHeight, postHeight, leftPostW, rightPostW, midPostW, midPostCount, topRailH, midRailH, botRailH, picketW, picketSpacing, slope, leftPostType = 'hss_rect', rightPostType = 'hss_rect', midPostType = 'hss_rect', topRailType = 'hss_rect', midRailType = 'none', botRailType = 'hss_rect', picketType = 'hss_rect', includeBasePlates = 'no', bpW = 6.0, bpH = 0.5, bpHoleD = 0.5, bpHoleOffsetX = 0.5, bpHoleOffsetY = 0.25, midRailGap = 6.0, railsGatesType = 'gates', kickPlate = 'none', kickPlateH = 12.0, kickPlateWeld = 'inner', kickPlateSize = 'PL11GA', meshType = 'none', meshOpening = 2.0) {
+    _fallback_rails_gates: function(length, fenceHeight, postHeight, leftPostW, rightPostW, midPostW, midPostCount, topRailH, midRailH, botRailH, picketW, picketSpacing, slope = 0, leftPostType = 'hss_rect', rightPostType = 'hss_rect', midPostType = 'hss_rect', topRailType = 'hss_rect', midRailType = 'none', botRailType = 'hss_rect', picketType = 'hss_rect', includeBasePlates = 'no', bpW = 6.0, bpH = 0.5, bpHoleD = 0.5, bpHoleOffsetX = 0.5, bpHoleOffsetY = 0.25, midRailGap = 6.0, railsGatesType = 'gates', kickPlate = 'none', kickPlateH = 12.0, kickPlateWeld = 'inner', kickPlateSize = 'PL11GA', meshType = 'none', meshOpening = 2.0, infillType = 'pickets', puppyPickets = 'no', puppyPicketsLength = 16.0, puppyPicketsSpacing = 2.0, botRailElevation = 0.0, topGap = 0.0, wantLeftPost = 'no', wantRightPost = 'no', midPostCenters = null, lengthRef = 'c_to_c', capPlateMode = 'no', capPlateThickness = 0.25, capPlateWidth = 2.0, capPlateLength = 2.0, midRailExtraPickets = "no") {
         const s = 4; 
         const L = length * s;
         const FH = fenceHeight * s;
         const PH = postHeight * s;
-        const rad = slope * Math.PI / 180;
+        const safeSlope = (typeof slope !== 'undefined' && !isNaN(parseFloat(slope))) ? parseFloat(slope) : 0;
+        const rad = safeSlope * Math.PI / 180;
         const tan = Math.tan(rad);
         
         let postsHtml = "";
@@ -2533,37 +2879,63 @@ const CadEngine = {
 
         } else {
             // Original rails/posts SVG fallback logic
-            const leftPostY = groundY - (PH - effectiveEmbed_scaled);
-            postsHtml += `<rect x="0" y="${leftPostY}" width="${leftPostW_scaled}" height="${PH}" fill="none" stroke="#00d4ff" stroke-width="2"/>`;
-            if (leftPostType === 'hss_rect' && leftPostW_scaled > 1.6) {
-                const pt = 0.8;
-                postsHtml += `<rect class="hss-inner-line" x="${pt}" y="${leftPostY + pt}" width="${leftPostW_scaled - 2 * pt}" height="${PH - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
-            }
-            if (includeBasePlates === 'yes') {
-                basePlatesHtml += `<rect x="${leftPostW_scaled/2 - bpW_scaled/2}" y="${leftPostY + PH}" width="${bpW_scaled}" height="${bpH_scaled}" fill="none" stroke="#00d4ff" stroke-width="1.5"/>`;
+            const safeTopGap_scaled = Math.max(0, parseFloat(topGap) || 0) * s;
+            const panelTopY_scaled = groundY - FH;
+            const topY_scaled = panelTopY_scaled;
+            const postTopY_scaled = panelTopY_scaled - safeTopGap_scaled;
+            const leftPostY = postTopY_scaled;
+
+            if (leftPostType !== 'none' && wantLeftPost !== 'no') {
+                postsHtml += `<rect x="0" y="${leftPostY}" width="${leftPostW_scaled}" height="${PH}" fill="none" stroke="#00d4ff" stroke-width="2"/>`;
+                if (leftPostType === 'hss_rect' && leftPostW_scaled > 1.6) {
+                    const pt = 0.8;
+                    postsHtml += `<rect class="hss-inner-line" x="${pt}" y="${leftPostY + pt}" width="${leftPostW_scaled - 2 * pt}" height="${PH - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
+                }
+                if (includeBasePlates === 'yes') {
+                    basePlatesHtml += `<rect x="${leftPostW_scaled/2 - bpW_scaled/2}" y="${leftPostY + PH}" width="${bpW_scaled}" height="${bpH_scaled}" fill="none" stroke="#00d4ff" stroke-width="1.5"/>`;
+                }
             }
 
             const rightPx = L - rightPostW_scaled;
             const rightPyBase = L * tan;
-            const rightPostY = groundY - rightPyBase - (PH - effectiveEmbed_scaled);
-            postsHtml += `<rect x="${rightPx}" y="${rightPostY}" width="${rightPostW_scaled}" height="${PH}" fill="none" stroke="#00d4ff" stroke-width="2"/>`;
-            if (rightPostType === 'hss_rect' && rightPostW_scaled > 1.6) {
-                const pt = 0.8;
-                postsHtml += `<rect class="hss-inner-line" x="${rightPx + pt}" y="${rightPostY + pt}" width="${rightPostW_scaled - 2 * pt}" height="${PH - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
-            }
-            if (includeBasePlates === 'yes') {
-                basePlatesHtml += `<rect x="${rightPx + rightPostW_scaled/2 - bpW_scaled/2}" y="${rightPostY + PH}" width="${bpW_scaled}" height="${bpH_scaled}" fill="none" stroke="#00d4ff" stroke-width="1.5"/>`;
+            const rightPostY = postTopY_scaled - rightPyBase;
+            if (rightPostType !== 'none' && wantRightPost !== 'no') {
+                postsHtml += `<rect x="${rightPx}" y="${rightPostY}" width="${rightPostW_scaled}" height="${PH}" fill="none" stroke="#00d4ff" stroke-width="2"/>`;
+                if (rightPostType === 'hss_rect' && rightPostW_scaled > 1.6) {
+                    const pt = 0.8;
+                    postsHtml += `<rect class="hss-inner-line" x="${rightPx + pt}" y="${rightPostY + pt}" width="${rightPostW_scaled - 2 * pt}" height="${PH - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
+                }
+                if (includeBasePlates === 'yes') {
+                    basePlatesHtml += `<rect x="${rightPx + rightPostW_scaled/2 - bpW_scaled/2}" y="${rightPostY + PH}" width="${bpW_scaled}" height="${bpH_scaled}" fill="none" stroke="#00d4ff" stroke-width="1.5"/>`;
+                }
             }
 
-            const midPH_scaled = midPH + effectiveEmbed_scaled;
-            if (midPostCount > 0 && midPH_scaled > 0) {
-                const centerDist = L - leftPostW_scaled/2 - rightPostW_scaled/2;
-                const spanSpacing = centerDist / (midPostCount + 1);
-                for (let i = 1; i <= midPostCount; i++) {
-                    const midCx = leftPostW_scaled/2 + i * spanSpacing;
+            const actualLeftPostW_scaled = (wantLeftPost !== 'no' && leftPostType !== 'none') ? leftPostW_scaled : 0;
+            const actualRightPostW_scaled = (wantRightPost !== 'no' && rightPostType !== 'none') ? rightPostW_scaled : 0;
+            const clearSpan_scaled = L - actualLeftPostW_scaled - actualRightPostW_scaled;
+
+            const resolvedMidCenters_scaled = (midPostCenters && Array.isArray(midPostCenters) && midPostCenters.length > 0)
+                ? midPostCenters.map(cx => cx * s)
+                : (midPostCount > 0 ? (() => {
+                    const centers = [];
+                    const centerDist = L - actualLeftPostW_scaled - actualRightPostW_scaled;
+                    const spanSpacing = centerDist / (midPostCount + 1);
+                    for (let i = 1; i <= midPostCount; i++) {
+                        centers.push(actualLeftPostW_scaled + i * spanSpacing);
+                    }
+                    return centers;
+                })() : []);
+
+            const midPostTopY_scaled = topY_scaled + topRailH_scaled;
+            const postBottomY_scaled = leftPostY + PH;
+            const midPH_scaled = Math.max(1, postBottomY_scaled - midPostTopY_scaled);
+
+            if (resolvedMidCenters_scaled.length > 0 && midPH_scaled > 0) {
+                for (let i = 1; i <= resolvedMidCenters_scaled.length; i++) {
+                    const midCx = resolvedMidCenters_scaled[i - 1];
                     const midPx = midCx - midPostW_scaled/2;
                     const midPyBase = midCx * tan;
-                    const midPostY = groundY - midPyBase - midPH_scaled;
+                    const midPostY = midPostTopY_scaled - midPyBase;
                     postsHtml += `<rect x="${midPx}" y="${midPostY}" width="${midPostW_scaled}" height="${midPH_scaled}" fill="none" stroke="#00d4ff" stroke-width="2"/>`;
                     if (midPostType === 'hss_rect' && midPostW_scaled > 1.6 && midPH_scaled > 1.6) {
                         const pt = 0.8;
@@ -2575,76 +2947,172 @@ const CadEngine = {
                 }
             }
 
-            const topY_scaled = leftPostY;
-            railsHtml += `<rect x="0" y="${topY_scaled}" width="${L}" height="${topRailH_scaled}" fill="none" stroke="#00d4ff" stroke-width="2"/>`;
-            if (topRailType === 'hss_rect' && topRailH_scaled > 1.6) {
-                const pt = 0.8;
-                railsHtml += `<rect class="hss-inner-line" x="0" y="${topY_scaled + pt}" width="${L}" height="${topRailH_scaled - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
-            }
-            railsHtml += `<line class="hss-inner-line" x1="0" y1="${topY_scaled}" x2="${leftPostW_scaled}" y2="${topY_scaled + topRailH_scaled}" stroke="#00d4ff" stroke-width="1"/>`;
-            railsHtml += `<line class="hss-inner-line" x1="${L}" y1="${topY_scaled}" x2="${L - rightPostW_scaled}" y2="${topY_scaled + topRailH_scaled}" stroke="#00d4ff" stroke-width="1"/>`;
-
-            const botY_scaled = leftPostY + (PH - FH);
-            if (!isExtended) {
-                railsHtml += `<rect x="0" y="${botY_scaled}" width="${L}" height="${botRailH_scaled}" fill="none" stroke="#00d4ff" stroke-width="2"/>`;
-                if (botRailType === 'hss_rect' && botRailH_scaled > 1.6) {
+            // Top Runner: continuous across clear span sitting on top of mid posts
+            if (topRailType !== 'none' && clearSpan_scaled > 0) {
+                railsHtml += `<rect x="${actualLeftPostW_scaled}" y="${topY_scaled}" width="${clearSpan_scaled}" height="${topRailH_scaled}" fill="none" stroke="#00d4ff" stroke-width="2"/>`;
+                if (topRailType === 'hss_rect' && topRailH_scaled > 1.6) {
                     const pt = 0.8;
-                    railsHtml += `<rect class="hss-inner-line" x="0" y="${botY_scaled + pt}" width="${L}" height="${botRailH_scaled - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
-                }
-                railsHtml += `<line class="hss-inner-line" x1="0" y1="${botY_scaled + botRailH_scaled}" x2="${leftPostW_scaled}" y2="${botY_scaled}" stroke="#00d4ff" stroke-width="1"/>`;
-                railsHtml += `<line class="hss-inner-line" x1="${L}" y1="${botY_scaled + botRailH_scaled}" x2="${L - rightPostW_scaled}" y2="${botY_scaled}" stroke="#00d4ff" stroke-width="1"/>`;
-            } else {
-                const botLen_scaled = L - leftPostW_scaled - rightPostW_scaled;
-                railsHtml += `<rect x="${leftPostW_scaled}" y="${botY_scaled}" width="${botLen_scaled}" height="${botRailH_scaled}" fill="none" stroke="#00d4ff" stroke-width="2"/>`;
-                if (botRailType === 'hss_rect' && botRailH_scaled > 1.6) {
-                    const pt = 0.8;
-                    railsHtml += `<rect class="hss-inner-line" x="${leftPostW_scaled}" y="${botY_scaled + pt}" width="${botLen_scaled}" height="${botRailH_scaled - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
+                    railsHtml += `<rect class="hss-inner-line" x="${actualLeftPostW_scaled}" y="${topY_scaled + pt}" width="${clearSpan_scaled}" height="${topRailH_scaled - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
                 }
             }
 
-            if (midRailType !== 'none') {
-                const midRailY_scaled = topY_scaled + (midRailGap * s);
-                const midLen_scaled = L - leftPostW_scaled - rightPostW_scaled;
-                railsHtml += `<rect x="${leftPostW_scaled}" y="${midRailY_scaled}" width="${midLen_scaled}" height="${midRailH_scaled}" fill="none" stroke="#00d4ff" stroke-width="2"/>`;
-                if (midRailType === 'hss_rect' && midRailH_scaled > 2 * pt) {
-                    const pt = 0.8;
-                    railsHtml += `<rect class="hss-inner-line" x="${leftPostW_scaled}" y="${midRailY_scaled + pt}" width="${midLen_scaled}" height="${midRailH_scaled - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
-                }
+            // Runner spans between posts for bottom and mid runners
+            const runnerSpans_scaled = [];
+            let curX_scaled = actualLeftPostW_scaled;
+            if (resolvedMidCenters_scaled && resolvedMidCenters_scaled.length > 0) {
+                resolvedMidCenters_scaled.forEach(midCx => {
+                    const mpLeft = midCx - midPostW_scaled / 2;
+                    const mpRight = midCx + midPostW_scaled / 2;
+                    if (mpLeft > curX_scaled) {
+                        runnerSpans_scaled.push({ startX: curX_scaled, endX: mpLeft });
+                    }
+                    curX_scaled = mpRight;
+                });
+            }
+            if (L - actualRightPostW_scaled > curX_scaled) {
+                runnerSpans_scaled.push({ startX: curX_scaled, endX: L - actualRightPostW_scaled });
+            }
+
+            const hasPosts_scaled = (actualLeftPostW_scaled > 0 || actualRightPostW_scaled > 0 || resolvedMidCenters_scaled.length > 0);
+            const botElev_scaled = hasPosts_scaled ? ((typeof botRailElevation !== 'undefined' && !isNaN(parseFloat(botRailElevation))) ? parseFloat(botRailElevation) * s : 0) : 0;
+            const botY_scaled = groundY - botElev_scaled - botRailH_scaled;
+            if (botRailType !== 'none' && runnerSpans_scaled.length > 0) {
+                runnerSpans_scaled.forEach(span => {
+                    const w = span.endX - span.startX;
+                    railsHtml += `<rect x="${span.startX}" y="${botY_scaled}" width="${w}" height="${botRailH_scaled}" fill="none" stroke="#00d4ff" stroke-width="2"/>`;
+                    if (botRailType === 'hss_rect' && botRailH_scaled > 1.6) {
+                        const pt = 0.8;
+                        railsHtml += `<rect class="hss-inner-line" x="${span.startX}" y="${botY_scaled + pt}" width="${w}" height="${botRailH_scaled - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
+                    }
+                });
+            }
+
+            if (midRailType !== 'none' && runnerSpans_scaled.length > 0) {
+                const midRailY_scaled = botY_scaled - (midRailGap * s) - midRailH_scaled;
+                runnerSpans_scaled.forEach(span => {
+                    const w = span.endX - span.startX;
+                    railsHtml += `<rect x="${span.startX}" y="${midRailY_scaled}" width="${w}" height="${midRailH_scaled}" fill="none" stroke="#00d4ff" stroke-width="2"/>`;
+                    if (midRailType === 'hss_rect' && midRailH_scaled > 1.6) {
+                        const pt = 0.8;
+                        railsHtml += `<rect class="hss-inner-line" x="${span.startX}" y="${midRailY_scaled + pt}" width="${w}" height="${midRailH_scaled - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
+                    }
+                });
             }
 
             const picketBottomY_scaled = botY_scaled + botRailH_scaled;
             const picketTopY_scaled = (midRailType !== 'none') ? (topY_scaled + midRailGap * s) : topY_scaled;
             const picketH_scaled = Math.max(8, picketTopY_scaled - picketBottomY_scaled);
 
-            const spanCenterDist_scaled = (L - rightPostW_scaled / 2) - (leftPostW_scaled / 2);
+            let numPickets = 0;
+            let faceMargin_scaled = 0;
             const targetSpacing_scaled = picketSpacing_scaled;
-            const numPickets = (picketType !== 'none' && targetSpacing_scaled > 0) ? Math.max(0, Math.ceil((spanCenterDist_scaled - targetSpacing_scaled) / targetSpacing_scaled)) : 0;
-            
-            if (picketType !== 'none' && numPickets > 0) {
-                const endGap_scaled = (spanCenterDist_scaled - (numPickets - 1) * targetSpacing_scaled) / 2;
-                for (let i = 0; i < numPickets; i++) {
-                    const px_center_scaled = (leftPostW_scaled / 2) + endGap_scaled + i * targetSpacing_scaled;
-                    const px_scaled = px_center_scaled - picketW_scaled / 2;
-                    
-                    let overlapsMid = false;
-                    if (midPostCount > 0 && midPH > 0) {
-                        const centerDist = L - leftPostW_scaled/2 - rightPostW_scaled/2;
-                        const spanSpacing = centerDist / (midPostCount + 1);
-                        for (let j = 1; j <= midPostCount; j++) {
-                            const midCx = leftPostW_scaled/2 + j * spanSpacing;
-                            if (Math.abs(px_scaled + picketW_scaled/2 - midCx) < (midPostW/2 + picketW_scaled/2 + 2)) {
-                                overlapsMid = true;
-                                break;
+
+            if (picketType !== 'none' && targetSpacing_scaled > 0) {
+                if (resolvedMidCenters_scaled.length > 0) {
+                    const startX_scaled = (actualLeftPostW_scaled > 0) ? (leftPostW_scaled / 2) : 0;
+                    const endX_scaled = (actualRightPostW_scaled > 0) ? (L - rightPostW_scaled / 2) : L;
+                    const bayDividers_scaled = [startX_scaled, ...resolvedMidCenters_scaled, endX_scaled];
+                    const numBays = bayDividers_scaled.length - 1;
+
+                    for (let b = 0; b < numBays; b++) {
+                        const s1_s = bayDividers_scaled[b];
+                        const s2_s = bayDividers_scaled[b + 1];
+                        const isLeftCorner = (b === 0);
+                        const isRightCorner = (b === numBays - 1);
+                        const bayPicketCenters_scaled = [];
+
+                        const minCornerGapL_s = (isLeftCorner && actualLeftPostW_scaled > 0) ? (leftPostW_scaled / 2 + picketW_scaled / 2 + 0.5 * s) : 0.75 * s;
+                        const minCornerGapR_s = (isRightCorner && actualRightPostW_scaled > 0) ? (rightPostW_scaled / 2 + picketW_scaled / 2 + 0.5 * s) : 0.75 * s;
+
+                        if (isLeftCorner && !isRightCorner) {
+                            const pLast_s = s2_s - targetSpacing_scaled;
+                            const avail_s = pLast_s - s1_s;
+                            const spaces = Math.max(0, Math.floor((avail_s - minCornerGapL_s + 1e-4) / targetSpacing_scaled));
+                            const pFirst_s = pLast_s - spaces * targetSpacing_scaled;
+                            for (let i = 0; i <= spaces; i++) {
+                                bayPicketCenters_scaled.push(pFirst_s + i * targetSpacing_scaled);
+                            }
+                        } else if (isRightCorner && !isLeftCorner) {
+                            const pFirst_s = s1_s + targetSpacing_scaled;
+                            const avail_s = s2_s - pFirst_s;
+                            const spaces = Math.max(0, Math.floor((avail_s - minCornerGapR_s + 1e-4) / targetSpacing_scaled));
+                            for (let i = 0; i <= spaces; i++) {
+                                bayPicketCenters_scaled.push(pFirst_s + i * targetSpacing_scaled);
+                            }
+                        } else if (!isLeftCorner && !isRightCorner) {
+                            const pFirst_s = s1_s + targetSpacing_scaled;
+                            const pLast_s = s2_s - targetSpacing_scaled;
+                            const avail_s = pLast_s - pFirst_s;
+                            if (avail_s >= -1e-4) {
+                                const spaces = Math.max(0, Math.round(avail_s / targetSpacing_scaled));
+                                const actSpc_s = (spaces > 0) ? (avail_s / spaces) : targetSpacing_scaled;
+                                for (let i = 0; i <= spaces; i++) {
+                                    bayPicketCenters_scaled.push(pFirst_s + i * actSpc_s);
+                                }
+                            }
+                        } else {
+                            const avail_s = s2_s - s1_s;
+                            const minGap_s = 1.5 * s;
+                            const spaces = Math.max(0, Math.floor((avail_s - 2 * minGap_s + 1e-4) / targetSpacing_scaled));
+                            const spanLen_s = spaces * targetSpacing_scaled;
+                            const endGap_s = (avail_s - spanLen_s) / 2;
+                            const pFirst_s = s1_s + endGap_s;
+                            for (let i = 0; i <= spaces; i++) {
+                                bayPicketCenters_scaled.push(pFirst_s + i * targetSpacing_scaled);
+                            }
+                        }
+
+                        for (let i = 0; i < bayPicketCenters_scaled.length; i++) {
+                            const px_center_scaled = bayPicketCenters_scaled[i];
+                            const px_scaled = px_center_scaled - picketW_scaled / 2;
+                            picketsHtml += `<rect x="${px_scaled}" y="${picketBottomY_scaled}" width="${picketW_scaled}" height="${picketH_scaled}" fill="none" stroke="#00d4ff" stroke-width="1.5"/>`;
+                            if (picketType === 'hss_rect' && picketW_scaled > 1.6) {
+                                const pt = 0.8;
+                                picketsHtml += `<rect class="hss-inner-line" x="${px_scaled + pt}" y="${picketBottomY_scaled + pt}" width="${picketW_scaled - 2 * pt}" height="${picketH_scaled - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
                             }
                         }
                     }
-                    
-                    if (overlapsMid) continue;
-                    
-                    picketsHtml += `<rect x="${px_scaled}" y="${picketBottomY_scaled}" width="${picketW_scaled}" height="${picketH_scaled}" fill="none" stroke="#00d4ff" stroke-width="1.5"/>`;
-                    if (picketType === 'hss_rect' && picketW_scaled > 1.6) {
-                        const pt = 0.8;
-                        picketsHtml += `<rect class="hss-inner-line" x="${px_scaled + pt}" y="${picketBottomY_scaled + pt}" width="${picketW_scaled - 2 * pt}" height="${picketH_scaled - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
+                } else if (clearSpan_scaled > 0) {
+                    if (lengthRef === 'c_to_c') {
+                        const fieldCenterDist_scaled = clearSpan_scaled + leftPostW_scaled / 2 + rightPostW_scaled / 2;
+                        numPickets = Math.max(0, Math.ceil((fieldCenterDist_scaled - targetSpacing_scaled - 1e-4) / targetSpacing_scaled));
+                        if (numPickets > 0) {
+                            const endGap_scaled = (fieldCenterDist_scaled - (numPickets - 1) * targetSpacing_scaled) / 2;
+                            faceMargin_scaled = endGap_scaled - leftPostW_scaled / 2;
+                        }
+                    } else if (lengthRef === 'c_to_out') {
+                        const fieldCenterDist_scaled = clearSpan_scaled + leftPostW_scaled / 2 + (actualRightPostW_scaled > 0 ? rightPostW_scaled / 2 : 0);
+                        numPickets = Math.max(0, Math.ceil((fieldCenterDist_scaled - targetSpacing_scaled - 1e-4) / targetSpacing_scaled));
+                        if (numPickets > 0) {
+                            const endGap_scaled = (fieldCenterDist_scaled - (numPickets - 1) * targetSpacing_scaled) / 2;
+                            faceMargin_scaled = endGap_scaled - leftPostW_scaled / 2;
+                        }
+                    } else if (lengthRef === 'out_to_c') {
+                        const fieldCenterDist_scaled = clearSpan_scaled + (actualLeftPostW_scaled > 0 ? leftPostW_scaled / 2 : 0) + rightPostW_scaled / 2;
+                        numPickets = Math.max(0, Math.ceil((fieldCenterDist_scaled - targetSpacing_scaled - 1e-4) / targetSpacing_scaled));
+                        if (numPickets > 0) {
+                            const endGap_scaled = (fieldCenterDist_scaled - (numPickets - 1) * targetSpacing_scaled) / 2;
+                            faceMargin_scaled = endGap_scaled - (actualLeftPostW_scaled > 0 ? leftPostW_scaled / 2 : 0);
+                        }
+                    } else {
+                        const spanCenterDist_scaled = (actualRightPostW_scaled > 0 || actualLeftPostW_scaled > 0) ? ((L - actualRightPostW_scaled / 2) - (actualLeftPostW_scaled / 2)) : L;
+                        numPickets = Math.max(0, Math.ceil((spanCenterDist_scaled - targetSpacing_scaled - 1e-4) / targetSpacing_scaled));
+                        if (numPickets > 0) {
+                            const endGap_scaled = (spanCenterDist_scaled - (numPickets - 1) * targetSpacing_scaled) / 2;
+                            faceMargin_scaled = endGap_scaled - (actualLeftPostW_scaled > 0 ? (actualLeftPostW_scaled / 2) : 0);
+                        }
+                    }
+
+                    if (numPickets > 0) {
+                        for (let i = 0; i < numPickets; i++) {
+                            const px_center_scaled = actualLeftPostW_scaled + faceMargin_scaled + i * targetSpacing_scaled;
+                            const px_scaled = px_center_scaled - picketW_scaled / 2;
+                            picketsHtml += `<rect x="${px_scaled}" y="${picketBottomY_scaled}" width="${picketW_scaled}" height="${picketH_scaled}" fill="none" stroke="#00d4ff" stroke-width="1.5"/>`;
+                            if (picketType === 'hss_rect' && picketW_scaled > 1.6) {
+                                const pt = 0.8;
+                                picketsHtml += `<rect class="hss-inner-line" x="${px_scaled + pt}" y="${picketBottomY_scaled + pt}" width="${picketW_scaled - 2 * pt}" height="${picketH_scaled - 2 * pt}" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.6"/>`;
+                            }
+                        }
                     }
                 }
             }
@@ -2751,9 +3219,9 @@ const CadEngine = {
 
         const isExecutive = (style === 'executive' || style === 'executive_custom');
 
-        // Mid posts coordinates
         const midPosts = [];
-        if (midPostsOpt === 'yes' && midPostCount > 0) {
+        const hasMid = (midPostsOpt && midPostsOpt !== 'none' && midPostsOpt !== 'no');
+        if (hasMid && midPostCount > 0) {
             const startXBound = (leftPostOpt === 'yes') ? postW : 0;
             const endXBound = (rightPostOpt === 'yes') ? (length - postW) : length;
             const centerDist = endXBound - startXBound;
@@ -3177,9 +3645,9 @@ const CadEngine = {
 
         const isExecutive = (style === 'executive' || style === 'executive_custom');
 
-        // Mid posts list
         const midPosts = [];
-        if (midPostsOpt === 'yes' && midPostCount > 0) {
+        const hasMid = (midPostsOpt && midPostsOpt !== 'none' && midPostsOpt !== 'no');
+        if (hasMid && midPostCount > 0) {
             const startXBound = (leftPostOpt === 'yes') ? postW_scaled : 0;
             const endXBound = (rightPostOpt === 'yes') ? (L - postW_scaled) : L;
             const centerDist = endXBound - startXBound;
@@ -3453,7 +3921,7 @@ const CadEngine = {
         return html;
     },
 
-    createLoosePostModel: function(postW, postHeight, topRailH, postType, postT, includeBasePlates, bpW, bpL, bpH, bpHoleD, bpHoleOffsetX, bpHoleOffsetY, style, fenceHeight, botRailH, midRailType, midRailGap, midRailH, side = 'left', extraLen = 0, offsetX = 0, offsetY = 0, basePlateConfig = null) {
+    createLoosePostModel: function(postW, postHeight, topRailH, postType, postT, includeBasePlates, bpW, bpL, bpH, bpHoleD, bpHoleOffsetX, bpHoleOffsetY, style, fenceHeight, botRailH, midRailType, midRailGap, midRailH, side = 'left', extraLen = 0, offsetX = 0, offsetY = 0, basePlateConfig = null, includeCap = 'no', capThickness = 0.25, capWidth = 2.0, capLength = 2.0) {
         const model = {
             models: {
                 posts: { models: {} }
@@ -3552,6 +4020,18 @@ const CadEngine = {
                 model.models.basePlates.models['bpLoose'] = bp;
             }
         }
+
+        if (includeCap === 'yes' || includeCap === true) {
+            const capT = parseFloat(capThickness) || 0.25;
+            const capWidthVal = parseFloat(capWidth) || postW;
+            const cap = {
+                models: { outer: new makerjs.models.Rectangle(capWidthVal, capT) },
+                origin: [offX - capWidthVal / 2, effectivePostHeight]
+            };
+            if (!model.models.capPlates) model.models.capPlates = { models: {} };
+            model.models.capPlates.models['capLoose'] = cap;
+        }
+
         return model;
     }
 };

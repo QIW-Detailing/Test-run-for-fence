@@ -273,6 +273,15 @@ path {
 }
 .makerjs-path { stroke: var(--accent-primary); fill: none; }
 .makerjs-dimension { stroke: var(--accent-secondary); font-family: 'JetBrains Mono'; font-size: 12px; }
+.makerjs-layer-loose_post path, 
+.makerjs-layer-loose_post line, 
+path[class*="loose_post"], 
+[data-makerjs-layer="loose_post"] path,
+.loose-post {
+    stroke: #94a3b8 !important;
+    stroke-dasharray: 6 3 !important;
+    opacity: 0.85;
+}
 
 /* Canvas Styling */
 #sketch-canvas {
