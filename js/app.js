@@ -44062,7 +44062,35 @@ if (botMark) {
 
                 const isSlopedFence = (typeof safeSlope !== 'undefined' && Math.abs(safeSlope) > 0.01);
 
-                const cadBottomPdfY = Math.max(pdfY + drawH, cadToPdf(0, 0)[1]);
+                let cadBottomPdfY = Math.max(pdfY + drawH, cadToPdf(0, 0)[1]);
+
+                const hasBotRail = (vals.botRailType && vals.botRailType !== 'none');
+
+                const hasPostsLocal = (vals.wantLeftPost !== 'no' && vals.postType !== 'none') || (vals.wantRightPost !== 'no' && vals.postType !== 'none');
+
+                const hasMidPostsLocal = (vals.midPosts && vals.midPosts !== 'none' && vals.midPosts !== 'no');
+
+                const shouldShowBotDim = hasBotRail && (isSlopedFence || hasPostsLocal || hasMidPostsLocal);
+
+                if (shouldShowBotDim) {
+
+                    const panelBotY = hasPostsLocal ? ((vals.botRailElevation !== undefined && vals.botRailElevation !== '' && !isNaN(parseFloat(vals.botRailElevation))) ? parseFloat(vals.botRailElevation) : 0) : 0;
+
+                    const runnerPdfY = cadToPdf(0, panelBotY)[1];
+
+                    const postBottomPdfY = hasPostsLocal ? cadToPdf(0, 0)[1] : runnerPdfY;
+
+                    const postDropMm = Math.max(0, postBottomPdfY - runnerPdfY);
+
+                    const hasBottomLabels = !isSlopedFence && (botMark || (picketMark && hasPostsLocal));
+
+                    const dimBotRunnerOffset = isSlopedFence ? 28.0 : Math.max(hasBottomLabels ? 25.0 : 16.0, (postDropMm < 30.0 ? postDropMm + 18.0 : 0));
+
+                    const botDimPdfY = runnerPdfY + dimBotRunnerOffset + 2.5;
+
+                    cadBottomPdfY = Math.max(cadBottomPdfY, botDimPdfY);
+
+                }
 
                 let mmCenterY = isSlopedFence ? Math.min(232.0, Math.max(225.0, cadBottomPdfY + 32.0)) : (cadBottomPdfY + 14.0);
 
@@ -46584,7 +46612,13 @@ if (botMark) {
 
                     const hasBottomLabels = !isSlopedFence && (botMark || (picketMark && (vals.wantLeftPost !== 'no' && vals.postType !== 'none')));
 
-                    const dimBotRunnerOffset = isSlopedFence ? 28.0 : (hasBottomLabels ? 16.0 : 8.0);
+                    const runnerPdfY = cadToPdf(0, panelBotY)[1];
+
+                    const postBottomPdfY = hasPosts ? cadToPdf(0, 0)[1] : runnerPdfY;
+
+                    const postDropMm = Math.max(0, postBottomPdfY - runnerPdfY);
+
+                    const dimBotRunnerOffset = isSlopedFence ? 28.0 : Math.max(hasBottomLabels ? 25.0 : 16.0, (postDropMm < 30.0 ? postDropMm + 18.0 : 0));
 
                     const midPostCount = (vals.midPosts && vals.midPosts !== 'none' && vals.midPosts !== 'no')
 
