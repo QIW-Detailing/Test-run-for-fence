@@ -43316,7 +43316,11 @@ if (botMark) {
 
                     if (hasLeftPostLocal && picketMark && numPickets > 0) {
 
-                        targetCx = startXBound + firstPanelW * 0.68;
+                        targetCx = startXBound + firstPanelW * 0.76;
+
+                    } else if (hasPostsLocal || midPostCountFlat > 0) {
+
+                        targetCx = startXBound + firstPanelW * 0.72;
 
                     } else {
 
@@ -43348,9 +43352,9 @@ if (botMark) {
 
                     const targetY = target ? target[1] : NaN;
 
-                    const labelX = (hasLeftPostLocal && picketMark && numPickets > 0) ? (targetX - 8.0) : (targetX - 16.0);
+                    const labelX = (hasLeftPostLocal && picketMark && numPickets > 0) ? (targetX - 5.0) : (targetX - 8.0);
 
-                    const labelY = targetY + 5.7;
+                    const labelY = targetY + 6.2;
 
                     
 
@@ -43362,7 +43366,15 @@ if (botMark) {
 
                         const resolvedBot = (typeof markMap !== 'undefined' && markMap[botMark]) ? markMap[botMark] : botMark;
 
-                        doc.text(String(resolvedBot), labelX, labelY, { align: "right" });
+                        const botStr = String(resolvedBot);
+
+                        const tW = doc.getTextWidth(botStr) || 4.0;
+
+                        doc.setFillColor(255, 255, 255);
+
+                        doc.rect(labelX - tW - 0.6, labelY - 2.5, tW + 1.2, 3.2, 'F');
+
+                        doc.text(botStr, labelX, labelY, { align: "right" });
 
                         
 
@@ -43382,6 +43394,10 @@ if (botMark) {
 
                     if (fenceRunnerSpans && fenceRunnerSpans.length > 1) {
 
+                        const resolvedBotMarkVal = (typeof markMap !== 'undefined' && markMap[botMark]) ? markMap[botMark] : botMark;
+
+                        const labeledRunnerMarks = new Set([resolvedBotMarkVal]);
+
                         for (let sIdx = 1; sIdx < fenceRunnerSpans.length; sIdx++) {
 
                             const span = fenceRunnerSpans[sIdx];
@@ -43390,7 +43406,15 @@ if (botMark) {
 
                             const resolvedSeg = (typeof markMap !== 'undefined' && markMap[segRawMark]) ? markMap[segRawMark] : (typeof markMap !== 'undefined' && markMap[botMark] ? markMap[botMark] : botMark);
 
-                            const segTargetCx = (span.x1 + span.x2) / 2;
+                            if (labeledRunnerMarks.has(resolvedSeg)) {
+
+                                continue;
+
+                            }
+
+                            labeledRunnerMarks.add(resolvedSeg);
+
+                            const segTargetCx = span.x1 + (span.x2 - span.x1) * 0.72;
 
                             const segTarget = cadToPdf(segTargetCx, cyBot);
 
@@ -43400,9 +43424,9 @@ if (botMark) {
 
                                 const sTargetY = segTarget[1];
 
-                                const sLabelX = sTargetX - 8.0;
+                                const sLabelX = sTargetX - 5.0;
 
-                                const sLabelY = sTargetY + 5.7;
+                                const sLabelY = sTargetY + 6.2;
 
                                 doc.setFont('helvetica', 'bold');
 
@@ -43452,7 +43476,7 @@ if (botMark) {
 
 
 
-                    let pickCx = startXBound + firstPanelW * 0.22;
+                    let pickCx = startXBound + firstPanelW * 0.28;
 
                     const picketsModels = currentModel && currentModel.models && currentModel.models.pickets && currentModel.models.pickets.models;
 
@@ -43474,7 +43498,7 @@ if (botMark) {
 
                                     const cx = (ext0.low[0] + ext0.high[0]) * 0.5;
 
-                                    if (cx > startXBound + 0.5 && cx < startXBound + firstPanelW * 0.45) {
+                                    if (cx > startXBound + 0.5 && cx < startXBound + firstPanelW * 0.42) {
 
                                         const d = Math.abs(cx - pickCx);
 
@@ -43510,7 +43534,7 @@ if (botMark) {
 
                     const railY = cadToPdf(pickCx, (botElev + (botH || 2.0) / 2));
 
-                    const bottomLabelY = (railY && !isNaN(railY[1])) ? (railY[1] + 5.7) : (targetY + 8.5);
+                    const bottomLabelY = (railY && !isNaN(railY[1])) ? (railY[1] + 6.2) : (targetY + 8.5);
 
 
 
@@ -43528,11 +43552,17 @@ if (botMark) {
 
                         // Place label below bottom rail outside drawing, matching horizontal datum of botMark
 
-                        const labelX = targetX - 8.0;
+                        const labelX = targetX - 5.0;
 
                         const labelY = bottomLabelY;
 
 
+
+                        const pW = doc.getTextWidth(pickText) || 4.0;
+
+                        doc.setFillColor(255, 255, 255);
+
+                        doc.rect(labelX - pW - 0.6, labelY - 2.5, pW + 1.2, 3.2, 'F');
 
                         doc.text(pickText, labelX, labelY, { align: "right" });
 
@@ -46552,7 +46582,9 @@ if (botMark) {
 
                 if (shouldShowBotDim) {
 
-                    const dimBotRunnerOffset = isSlopedFence ? 28.0 : 8.0;
+                    const hasBottomLabels = !isSlopedFence && (botMark || (picketMark && (vals.wantLeftPost !== 'no' && vals.postType !== 'none')));
+
+                    const dimBotRunnerOffset = isSlopedFence ? 28.0 : (hasBottomLabels ? 16.0 : 8.0);
 
                     const midPostCount = (vals.midPosts && vals.midPosts !== 'none' && vals.midPosts !== 'no')
 
